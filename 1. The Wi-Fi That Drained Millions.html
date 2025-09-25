@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber Security Training & Quiz</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap');
+
+        :root {
+            --primary-color: #00ff00; /* Neon Green */
+            --secondary-color: #00aaff; /* Cyber Blue */
+            --background-dark: #1a1a2e; /* Dark Blue-Purple */
+            --background-light: #16213e; /* Slightly lighter */
+            --text-light: #e0e0e0;
+            --text-dark: #a0a0a0;
+            --border-glow: rgba(0, 255, 0, 0.7);
+            --shadow-glow: rgba(0, 255, 0, 0.4);
+        }
+
+        body {
+            font-family: 'Share Tech Mono', monospace;
+            background-color: var(--background-dark);
+            color: var(--text-light);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(0, 255, 0, 0.05) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            background-color: var(--background-light);
+            border: 1px solid var(--primary-color);
+            box-shadow: 0 0 15px var(--shadow-glow), 0 0 30px rgba(0, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 30px;
+            max-width: 900px;
+            width: 90%;
+            text-align: center;
+            z-index: 1;
+            position: relative;
+            animation: fadeIn 1s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1, h2, h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--primary-color);
+            text-shadow: 0 0 8px var(--shadow-glow);
+            margin-bottom: 20px;
+        }
+
+        video {
+            width: 100%;
+            max-width: 800px;
+            display: block;
+            margin: 0 auto 30px auto;
+            border: 2px solid var(--secondary-color);
+            box-shadow: 0 0 10px var(--secondary-color);
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+        video:hover {
+            box-shadow: 0 0 20px var(--secondary-color), 0 0 40px rgba(0, 170, 255, 0.2);
+        }
+
+        /* Hide download button and context menu for video */
+        video::-webkit-media-controls-enclosure {
+            overflow: hidden;
+        }
+
+        video::-webkit-media-controls-panel {
+            width: 101%; /* Make it slightly wider to push download button off-screen */
+        }
+        
+        video::-webkit-media-controls-download-button {
+            display: none !important;
+        }
+        
+        /* Additional download prevention */
+        video::-webkit-media-controls-fullscreen-button {
+            display: none;
+        }
+        
+        /* Hide all download-related controls */
+        video::-webkit-media-controls {
+            overflow: hidden;
+        }
+        
+        video::-webkit-media-controls-start-playback-button {
+            display: none;
+        }
+
+        /* Disable progress bar interaction while keeping it visible */
+        video::-webkit-media-controls-timeline {
+            pointer-events: none !important;
+            opacity: 0.7;
+        }
+        
+        video::-webkit-media-controls-timeline:hover {
+            pointer-events: none !important;
+        }
+        
+        /* Disable seeking on the video element */
+        video {
+            pointer-events: all;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        
+        /* Prevent video dragging */
+        video {
+            -webkit-user-drag: none;
+            -khtml-user-drag: none;
+            -moz-user-drag: none;
+            -o-user-drag: none;
+            user-drag: none;
+        }
+
+        #quiz-section {
+            display: none; /* Hidden until video ends */
+            text-align: left;
+            margin-top: 20px;
+        }
+
+        .question-container {
+            background-color: var(--background-dark);
+            border: 1px solid var(--secondary-color);
+            box-shadow: 0 0 10px rgba(0, 170, 255, 0.5);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            transition: all 0.4s ease-in-out;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        .question-container.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .question-container h3 {
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            text-shadow: none;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .option-button {
+            background-color: var(--background-light);
+            color: var(--text-light);
+            border: 1px solid var(--secondary-color);
+            padding: 12px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1em;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.1), transparent);
+            transition: 0.5s;
+        }
+
+        .option-button:hover::before {
+            left: 100%;
+        }
+
+        .option-button:hover {
+            background-color: rgba(0, 170, 255, 0.2);
+            border-color: var(--primary-color);
+            transform: translateY(-3px);
+            box-shadow: 0 0 10px rgba(0, 170, 255, 0.6);
+        }
+
+        .option-button.selected {
+            background-color: rgba(0, 255, 0, 0.3);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 10px var(--primary-color);
+        }
+        .option-button.correct {
+            background-color: rgba(0, 255, 0, 0.4);
+            border-color: var(--primary-color);
+            animation: pulseGreen 0.7s infinite alternate;
+        }
+        .option-button.wrong {
+            background-color: rgba(255, 0, 0, 0.3);
+            border-color: #ff0000;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes pulseGreen {
+            from { box-shadow: 0 0 10px var(--primary-color); }
+            to { box-shadow: 0 0 20px var(--primary-color), 0 0 5px var(--primary-color); }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+
+
+        .navigation-buttons {
+            display: flex;
+            justify-content: flex-end; /* Align to the right to only show Next/Submit */
+            margin-top: 30px;
+        }
+
+        .nav-button, #submit-quiz, #retake-quiz {
+            background-color: var(--secondary-color);
+            color: var(--background-dark);
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 0 10px rgba(0, 170, 255, 0.5);
+        }
+
+        .nav-button:hover, #submit-quiz:hover, #retake-quiz:hover {
+            background-color: var(--primary-color);
+            color: var(--background-dark);
+            box-shadow: 0 0 15px var(--primary-color);
+            transform: translateY(-2px) scale(1.02);
+        }
+        .nav-button:disabled {
+            background-color: var(--text-dark);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        #quiz-results {
+            display: none;
+            margin-top: 40px;
+            border-top: 2px dashed var(--primary-color);
+            padding-top: 30px;
+            max-height: 70vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-color) var(--background-dark);
+        }
+
+        /* Custom scrollbar styling for webkit browsers */
+        #quiz-results::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #quiz-results::-webkit-scrollbar-track {
+            background: var(--background-dark);
+            border-radius: 4px;
+        }
+
+        #quiz-results::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
+            box-shadow: 0 0 5px var(--shadow-glow);
+        }
+
+        #quiz-results::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary-color);
+            box-shadow: 0 0 8px var(--secondary-color);
+        }
+
+        #score-display {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5em;
+            color: var(--primary-color);
+            text-shadow: 0 0 10px var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        #retake-quiz {
+            margin-top: 20px;
+            display: block;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .result-details {
+            padding-bottom: 20px;
+        }
+
+        .result-details p {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+        .result-details .correct-answer {
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+        .result-details .your-answer {
+            color: var(--secondary-color);
+        }
+        .result-details .wrong-answer-feedback {
+            color: #ff5555;
+            font-style: italic;
+        }
+
+        /* Timer and Countdown Styles */
+        .timer-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .timer-label, .countdown-label {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--secondary-color);
+            font-size: 1em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .timer-display, .countdown-display {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1.8em;
+            color: var(--primary-color);
+            background-color: var(--background-dark);
+            border: 2px solid var(--primary-color);
+            border-radius: 8px;
+            padding: 8px 16px;
+            min-width: 60px;
+            text-align: center;
+            box-shadow: 0 0 15px var(--shadow-glow);
+            transition: all 0.3s ease;
+            animation: pulseTimer 2s infinite;
+        }
+
+        /* Pre-quiz countdown overlay */
+        .countdown-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(26, 26, 46, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .countdown-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .countdown-message {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--primary-color);
+            font-size: 1.5em;
+            text-align: center;
+            text-shadow: 0 0 10px var(--shadow-glow);
+            animation: glitch;
+        }
+
+        .countdown-display {
+            font-size: 4em;
+            animation: pulseCountdown 1s infinite;
+        }
+
+        .timer-display.warning, .countdown-display.warning {
+            color: #ffaa00;
+            border-color: #ffaa00;
+            box-shadow: 0 0 15px rgba(255, 170, 0, 0.6);
+            animation: pulseWarning 1s infinite;
+        }
+
+        .timer-display.danger, .countdown-display.danger {
+            color: #ff0000;
+            border-color: #ff0000;
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.6);
+            animation: pulseDanger 0.5s infinite;
+        }
+
+        @keyframes pulseTimer {
+            0%, 100% { box-shadow: 0 0 15px var(--shadow-glow); }
+            50% { box-shadow: 0 0 25px var(--shadow-glow), 0 0 35px rgba(0, 255, 0, 0.3); }
+        }
+
+        @keyframes pulseCountdown {
+            0%, 100% { 
+                box-shadow: 0 0 20px var(--shadow-glow); 
+                transform: scale(1);
+            }
+            50% { 
+                box-shadow: 0 0 30px var(--shadow-glow), 0 0 50px rgba(0, 255, 0, 0.5);
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes pulseWarning {
+            0%, 100% { box-shadow: 0 0 15px rgba(255, 170, 0, 0.6); }
+            50% { box-shadow: 0 0 25px rgba(255, 170, 0, 0.8), 0 0 35px rgba(255, 170, 0, 0.4); }
+        }
+
+        @keyframes pulseDanger {
+            0%, 100% { box-shadow: 0 0 15px rgba(255, 0, 0, 0.6); }
+            50% { box-shadow: 0 0 25px rgba(255, 0, 0, 0.8), 0 0 35px rgba(255, 0, 0, 0.4); }
+        }
+
+        /* Glitch effect for titles */
+        .glitch {
+            position: relative;
+            animation: glitch-anim 2s infinite linear alternate;
+        }
+
+        @keyframes glitch-anim {
+            0% { text-shadow: 0.05em 0 0 #00ff00, -0.05em -0.025em 0 #00aaff, -0.025em 0.05em 0 #ff00ff; }
+            14% { text-shadow: -0.05em -0.025em 0 #00ff00, 0.025em 0.025em 0 #00aaff, -0.05em -0.05em 0 #ff00ff; }
+            15% { text-shadow: 0.025em 0.05em 0 #00ff00, 0.05em 0 0 #00aaff, 0em -0.025em 0 #ff00ff; }
+            16% { text-shadow: -0.025em 0 0 #00ff00, -0.05em 0.025em 0 #00aaff, 0.025em -0.05em 0 #ff00ff; }
+            17% { text-shadow: 0em -0.05em 0 #00ff00, -0.025em -0.05em 0 #00aaff, 0.05em 0.025em 0 #ff00ff; }
+            20% { text-shadow: 0.05em 0.05em 0 #00ff00, -0.05em 0.05em 0 #00aaff, 0.025em -0.05em 0 #ff00ff; }
+            21% { text-shadow: -0.05em -0.05em 0 #00ff00, 0.05em 0 0 #00aaff, -0.025em -0.05em 0 #ff00ff; }
+            25% { text-shadow: 0.025em 0 0 #00ff00, -0.05em 0.05em 0 #00aaff, -0.05em -0.025em 0 #ff00ff; }
+            26% { text-shadow: -0.05em -0.025em 0 #00ff00, 0.025em 0.025em 0 #00aaff, 0.05em 0.05em 0 #ff00ff; }
+            30% { text-shadow: -0.05em 0.05em 0 #00ff00, 0.05em 0 0 #00aaff, -0.025em -0.05em 0 #ff00ff; }
+            31% { text-shadow: 0.025em -0.05em 0 #00ff00, 0.025em 0.05em 0 #00aaff, 0em 0.025em 0 #ff00ff; }
+            35% { text-shadow: -0.025em 0 0 #00ff00, 0.05em -0.025em 0 #00aaff, 0.025em 0.05em 0 #ff00ff; }
+            36% { text-shadow: 0.05em 0 0 #00ff00, -0.05em -0.025em 0 #00aaff, -0.025em 0.05em 0 #ff00ff; }
+            40% { text-shadow: -0.05em -0.025em 0 #00ff00, 0.025em 0.025em 0 #00aaff, -0.05em -0.05em 0 #ff00ff; }
+            41% { text-shadow: 0.025em 0.05em 0 #00ff00, 0.05em 0 0 #00aaff, 0em -0.025em 0 #ff00ff; }
+            45% { text-shadow: -0.025em 0 0 #00ff00, -0.05em 0.025em 0 #00aaff, 0.025em -0.05em 0 #ff00ff; }
+            46% { text-shadow: 0em -0.05em 0 #00ff00, -0.025em -0.05em 0 #00aaff, 0.05em 0.025em 0 #ff00ff; }
+            50% { text-shadow: 0.05em 0.05em 0 #00ff00, -0.05em 0.05em 0 #00aaff, 0.025em -0.05em 0 #ff00ff; }
+            51% { text-shadow: -0.05em -0.05em 0 #00ff00, 0.05em 0 0 #00aaff, -0.025em -0.05em 0 #ff00ff; }
+            55% { text-shadow: 0.025em 0 0 #00ff00, -0.05em 0.05em 0 #00aaff, -0.05em -0.025em 0 #ff00ff; }
+            56% { text-shadow: -0.05em -0.025em 0 #00ff00, 0.025em 0.025em 0 #00aaff, 0.05em 0.05em 0 #ff00ff; }
+            60% { text-shadow: -0.05em 0.05em 0 #00ff00, 0.05em 0 0 #00aaff, -0.025em -0.05em 0 #ff00ff; }
+            61% { text-shadow: 0.025em -0.05em 0 #00ff00, 0.025em 0.05em 0 #00aaff, 0em 0.025em 0 #ff00ff; }
+            65% { text-shadow: -0.025em 0 0 #00ff00, 0.05em -0.025em 0 #00aaff, 0.025em 0.05em 0 #ff00ff; }
+            66% { text-shadow: 0.05em 0 0 #00ff00, -0.05em -0.025em 0 #00aaff, -0.025em 0.05em 0 #ff00ff; }
+            70% { text-shadow: -0.05em -0.025em 0 #00ff00, 0.025em 0.025em 0 #00aaff, -0.05em -0.05em 0 #ff00ff; }
+            71% { text-shadow: 0.025em 0.05em 0 #00ff00, 0.05em 0 0 #00aaff, 0em -0.025em 0 #ff00ff; }
+            75% { text-shadow: -0.025em 0 0 #00ff00, -0.05em 0.025em 0 #00aaff, 0.025em -0.05em 0 #ff00ff; }
+            76% { text-shadow: 0em -0.05em 0 #00ff00, -0.025em -0.05em 0 #00aaff, 0.05em 0.025em 0 #ff00ff; }
+            80% { text-shadow: 0.05em 0.05em 0 #00ff00, -0.05em 0.05em 0 #00aaff, 0.025em -0.05em 0 #ff00ff; }
+            81% { text-shadow: -0.05em -0.05em 0 #00ff00, 0.05em 0 0 #00aaff, -0.025em -0.05em 0 #ff00ff; }
+            85% { text-shadow: 0.025em 0 0 #00ff00, -0.05em 0.05em 0 #00aaff, -0.05em -0.025em 0 #ff00ff; }
+            86% { text-shadow: -0.05em -0.025em 0 #00ff00, 0.025em 0.025em 0 #00aaff, 0.05em 0.05em 0 #ff00ff; }
+            90% { text-shadow: -0.05em 0.05em 0 #00ff00, 0.05em 0 0 #00aaff, -0.025em -0.05em 0 #ff00ff; }
+            91% { text-shadow: 0.025em -0.05em 0 #00ff00, 0.025em 0.05em 0 #00aaff, 0em 0.025em 0 #ff00ff; }
+            95% { text-shadow: -0.025em 0 0 #00ff00, 0.05em -0.025em 0 #00aaff, 0.025em 0.05em 0 #ff00ff; }
+            96% { text-shadow: 0.05em 0 0 #00ff00, -0.05em -0.025em 0 #00aaff, -0.025em 0.05em 0 #ff00ff; }
+            100% { text-shadow: -0.05em -0.025em 0 #00ff00, 0.025em 0.025em 0 #00aaff, -0.05em -0.05em 0 #ff00ff; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Removed H1 and P as requested -->
+
+        <video id="trainingVideo" controls autoplay muted controlsList="nodownload nofullscreen">
+            <!-- A placeholder video for 30 seconds -->
+            <source src="https://ryzfriykqluohxvulezu.supabase.co/storage/v1/object/public/ai%20videos/one%20password.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+
+        <!-- Pre-quiz countdown overlay -->
+        <div id="countdown-overlay" class="countdown-overlay" style="display: none;">
+            <div class="countdown-container">
+                <div class="countdown-message">Your assessment starts in</div>
+                <div id="countdown-display" class="countdown-display">3</div>
+            </div>
+        </div>
+
+        <div id="quiz-section">
+            <h2 class="glitch">SECURITY ASSESSMENT</h2>
+            <div class="timer-container">
+                <span class="timer-label">Time Remaining:</span>
+                <div id="timer-display" class="timer-display">20</div>
+            </div>
+            <div id="questions-container">
+                <!-- Questions will be loaded here by JavaScript -->
+            </div>
+            <div class="navigation-buttons">
+                <!-- Removed Previous button -->
+                <button id="next-btn" class="nav-button">Next</button>
+                <button id="submit-quiz" class="nav-button" style="display: none;">Submit Assessment</button>
+            </div>
+        </div>
+
+        <div id="quiz-results">
+            <h2 class="glitch">ASSESSMENT REPORT</h2>
+            <p id="score-display"></p>
+            <div class="result-details" id="detailed-results">
+                <!-- Detailed results will be displayed here -->
+            </div>
+            <button id="retake-quiz">Retake Assessment</button>
+        </div>
+    </div>
+
+    <script>
+        const video = document.getElementById('trainingVideo');
+        const quizSection = document.getElementById('quiz-section');
+        const questionsContainer = document.getElementById('questions-container');
+        const quizResults = document.getElementById('quiz-results');
+        const scoreDisplay = document.getElementById('score-display');
+        const detailedResults = document.getElementById('detailed-results');
+        // const prevBtn = document.getElementById('prev-btn'); // Removed
+        const nextBtn = document.getElementById('next-btn');
+        const submitQuizBtn = document.getElementById('submit-quiz');
+        const retakeQuizBtn = document.getElementById('retake-quiz');
+
+        let currentQuestionIndex = 0;
+        let userAnswers = {}; // To store user's selected answers
+        let questionTimer = null; // Timer for each question
+        let timeRemaining = 20; // 20 seconds per question
+        let isTimerRunning = false;
+        let preQuizCountdown = null; // Timer for pre-quiz countdown
+        let countdownRemaining = 3; // 3 seconds countdown
+        
+        // Audio elements
+        let countdownAudio = null;
+        let quizBackgroundAudio = null;
+        let buttonClickAudio = null;
+        let audioContext = null;
+        
+        // Initialize audio
+        function initAudio() {
+            try {
+                createAudioElements();
+                // Preload audio files and handle loading
+                if (countdownAudio) {
+                    countdownAudio.load();
+                    countdownAudio.addEventListener('canplaythrough', () => {
+                        console.log('Countdown audio loaded successfully');
+                    });
+                    countdownAudio.addEventListener('error', (e) => {
+                        console.log('Countdown audio loading failed:', e);
+                    });
+                }
+                
+                if (quizBackgroundAudio) {
+                    quizBackgroundAudio.load();
+                    quizBackgroundAudio.addEventListener('canplaythrough', () => {
+                        console.log('Background music loaded successfully');
+                    });
+                    quizBackgroundAudio.addEventListener('error', (e) => {
+                        console.log('Background music loading failed:', e);
+                    });
+                }
+                
+                if (buttonClickAudio) {
+                    buttonClickAudio.load();
+                    buttonClickAudio.addEventListener('canplaythrough', () => {
+                        console.log('Button click audio loaded successfully');
+                    });
+                    buttonClickAudio.addEventListener('error', (e) => {
+                        console.log('Button click audio loading failed:', e);
+                    });
+                }
+            } catch (e) {
+                console.log('Audio initialization failed:', e);
+            }
+        }
+        
+        // Create audio elements using real audio files
+        function createAudioElements() {
+            // Countdown sound from URL
+            countdownAudio = new Audio('https://ryzfriykqluohxvulezu.supabase.co/storage/v1/object/sign/sounds/Count%20Down%201.mp3?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzkxNDFjNy1hZTc1LTQ2ZmQtYmZjOS1iNGE2OGNhZDExNTgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzb3VuZHMvQ291bnQgRG93biAxLm1wMyIsImlhdCI6MTc1ODYyMDEzNywiZXhwIjoxNzkwMTU2MTM3fQ.W4hNo-vv_d3dfURtiCqlBC5oYMYkp5wn_sPkCxdRJTY');
+            countdownAudio.volume = 0.7;
+            countdownAudio.preload = 'auto';
+            
+            // Quiz background music from URL
+            quizBackgroundAudio = new Audio('https://ryzfriykqluohxvulezu.supabase.co/storage/v1/object/sign/sounds/bgm.mp3?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzkxNDFjNy1hZTc1LTQ2ZmQtYmZjOS1iNGE2OGNhZDExNTgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzb3VuZHMvYmdtLm1wMyIsImlhdCI6MTc1ODYxOTU2MiwiZXhwIjoxNzkwMTU1NTYyfQ.BQciqDvQYpBsSij1I9CpOYzMks01nhHr-chjnLXdXQI');
+            quizBackgroundAudio.volume = 0.5;
+            quizBackgroundAudio.loop = true;
+            quizBackgroundAudio.preload = 'auto';
+            
+            // Button click sound from URL
+            buttonClickAudio = new Audio('https://ryzfriykqluohxvulezu.supabase.co/storage/v1/object/sign/sounds/Pop%20Move%20Open.wav?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jNzkxNDFjNy1hZTc1LTQ2ZmQtYmZjOS1iNGE2OGNhZDExNTgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJzb3VuZHMvUG9wIE1vdmUgT3Blbi53YXYiLCJpYXQiOjE3NTg2MTk2NjcsImV4cCI6MTc5MDE1NTY2N30.9gHhSqLBty5IiWrN9sS_ZhIdrFDQB6ICt4Eau75Qumg');
+            buttonClickAudio.volume = 0.6;
+            buttonClickAudio.preload = 'auto';
+        }
+        
+
+        const questions = [
+            {
+                question: "What caused the TJX / T.J. Maxx credit card breach?",
+                options: [
+                    "A) Outdated cash registers",
+                    "B) Misconfigured, unsegmented Wi-Fi network",
+                    "C) Employee negligence in handling cash",
+                    "D) Phishing emails to customers"
+                ],
+                correctAnswer: "B) Misconfigured, unsegmented Wi-Fi network"
+            },
+            {
+                question: "Approximately how many credit card numbers were harvested in the breach?",
+                options: [
+                    "A) Thousands",
+                    "B) Millions",
+                    "C) Billions",
+                    "D) Hundreds"
+                ],
+                correctAnswer: "B) Millions"
+            },
+            {
+                question: "Which of the following is NOT one of the three defenses highlighted in the video?",
+                options: [
+                    "A) Segment Networks",
+                    "B) Encrypt & Tokenize",
+                    "C) Harden & Monitor",
+                    "D) Disable all wireless communication"
+                ],
+                correctAnswer: "D) Disable all wireless communication"
+            },
+            {
+                question: "In the video, what visual cue indicates an access point is vulnerable to attackers?",
+                options: [
+                    "A) It flashes red",
+                    "B) It disappears from the floor plan",
+                    "C) A green shield appears over it",
+                    "D) The store lights dim"
+                ],
+                correctAnswer: "A) It flashes red"
+            },
+            {
+                question: "Why is segmenting Wi-Fi networks critical for point-of-sale security, according to the video?",
+                options: [
+                    "A) It speeds up the network for shoppers",
+                    "B) It isolates sensitive payment traffic so attackers cannot easily sniff data",
+                    "C) It allows multiple devices to connect without interference",
+                    "D) It reduces electricity usage in the store"
+                ],
+                correctAnswer: "B) It isolates sensitive payment traffic so attackers cannot easily sniff data"
+            }
+        ];
+
+        // Pre-quiz countdown functions
+        function startPreQuizCountdown() {
+            const countdownOverlay = document.getElementById('countdown-overlay');
+            const countdownDisplay = document.getElementById('countdown-display');
+            
+            countdownOverlay.style.display = 'flex';
+            countdownRemaining = 3;
+            countdownDisplay.textContent = countdownRemaining;
+            
+            // Reset countdown display styles
+            countdownDisplay.classList.remove('warning', 'danger');
+            
+            // Play initial countdown sound (for "3") with a small delay to ensure audio is ready
+            setTimeout(() => {
+                if (countdownAudio) {
+                    countdownAudio.currentTime = 0;
+                    countdownAudio.play().catch(e => console.log('Countdown audio play failed:', e));
+                    
+                    // Stop countdown sound after 3 seconds
+                    setTimeout(() => {
+                        if (countdownAudio && !countdownAudio.paused) {
+                            countdownAudio.pause();
+                        }
+                    }, 3000);
+                }
+            }, 100);
+            
+            preQuizCountdown = setInterval(() => {
+                countdownRemaining--;
+                countdownDisplay.textContent = countdownRemaining;
+                
+                // Play countdown sound for each number
+                if (countdownAudio && countdownRemaining > 0) {
+                    countdownAudio.currentTime = 0; // Reset to beginning
+                    countdownAudio.play().catch(e => console.log('Countdown audio play failed:', e));
+                    
+                    // Stop countdown sound after 3 seconds
+                    setTimeout(() => {
+                        if (countdownAudio && !countdownAudio.paused) {
+                            countdownAudio.pause();
+                        }
+                    }, 3000);
+                }
+                
+                // Change color based on remaining time
+                if (countdownRemaining <= 1) {
+                    countdownDisplay.classList.remove('warning');
+                    countdownDisplay.classList.add('danger');
+                } else if (countdownRemaining <= 2) {
+                    countdownDisplay.classList.remove('danger');
+                    countdownDisplay.classList.add('warning');
+                }
+                
+                if (countdownRemaining <= 0) {
+                    clearInterval(preQuizCountdown);
+                    countdownOverlay.style.display = 'none';
+                    startQuiz();
+                }
+            }, 1000);
+        }
+        
+        function startQuiz() {
+            quizSection.style.display = 'block';
+            loadQuestion(currentQuestionIndex);
+            
+            // Start background music
+            if (quizBackgroundAudio) {
+                quizBackgroundAudio.play().catch(e => console.log('Background music play failed:', e));
+            }
+        }
+
+        // Timer functions
+        function startQuestionTimer() {
+            if (questionTimer) {
+                clearInterval(questionTimer);
+            }
+            
+            timeRemaining = 20;
+            isTimerRunning = true;
+            const timerDisplay = document.getElementById('timer-display');
+            
+            // Reset timer display to show 20 seconds immediately
+            timerDisplay.textContent = timeRemaining;
+            
+            // Reset timer display styles
+            timerDisplay.classList.remove('warning', 'danger');
+            
+            questionTimer = setInterval(() => {
+                timeRemaining--;
+                timerDisplay.textContent = timeRemaining;
+                
+                // Change timer color based on remaining time
+                if (timeRemaining <= 5) {
+                    timerDisplay.classList.remove('warning');
+                    timerDisplay.classList.add('danger');
+                } else if (timeRemaining <= 10) {
+                    timerDisplay.classList.remove('danger');
+                    timerDisplay.classList.add('warning');
+                }
+                
+                if (timeRemaining <= 0) {
+                    clearInterval(questionTimer);
+                    isTimerRunning = false;
+                    autoSkipToNext();
+                }
+            }, 1000);
+        }
+        
+        function stopQuestionTimer() {
+            if (questionTimer) {
+                clearInterval(questionTimer);
+                questionTimer = null;
+            }
+            isTimerRunning = false;
+        }
+        
+        function autoSkipToNext() {
+            // Mark current question as unanswered if no answer selected
+            if (userAnswers[currentQuestionIndex] === undefined) {
+                userAnswers[currentQuestionIndex] = "Time's up - No answer selected";
+            }
+            
+            // Move to next question or submit
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                loadQuestion(currentQuestionIndex);
+            } else {
+                // Submit quiz if it's the last question
+                submitQuizBtn.click();
+            }
+        }
+
+        // Function to load a specific question
+        function loadQuestion(index) {
+            // Stop any existing timer
+            stopQuestionTimer();
+            
+            questionsContainer.innerHTML = ''; // Clear previous question
+            const q = questions[index];
+
+            const questionDiv = document.createElement('div');
+            questionDiv.classList.add('question-container');
+            questionDiv.innerHTML = `<h3>${index + 1}. ${q.question}</h3><div class="options-grid"></div>`;
+
+            const optionsGrid = questionDiv.querySelector('.options-grid');
+            q.options.forEach(option => {
+                const button = document.createElement('button');
+                button.classList.add('option-button');
+                button.textContent = option;
+                button.onclick = () => selectOption(index, option, button);
+                optionsGrid.appendChild(button);
+            });
+
+            questionsContainer.appendChild(questionDiv);
+
+            // Animate question in
+            setTimeout(() => questionDiv.classList.add('active'), 50);
+
+            // Restore selected answer if it exists
+            if (userAnswers[index] !== undefined) {
+                const selectedOptionText = userAnswers[index];
+                const buttons = optionsGrid.querySelectorAll('.option-button');
+                buttons.forEach(btn => {
+                    if (btn.textContent === selectedOptionText) {
+                        btn.classList.add('selected');
+                    }
+                });
+            }
+
+            updateNavigationButtons();
+            
+            // Start timer for this question
+            startQuestionTimer();
+        }
+
+        // Function to handle option selection
+        function selectOption(qIndex, selectedOption, clickedButton) {
+            // Play button click sound
+            if (buttonClickAudio) {
+                buttonClickAudio.currentTime = 0; // Reset to beginning
+                buttonClickAudio.play().catch(e => console.log('Button click audio play failed:', e));
+            }
+            
+            userAnswers[qIndex] = selectedOption;
+            const optionsGrid = clickedButton.closest('.options-grid');
+            optionsGrid.querySelectorAll('.option-button').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            clickedButton.classList.add('selected');
+            
+            // Timer continues running - no longer stops when user selects an answer
+        }
+
+        // Update navigation button states
+        function updateNavigationButtons() {
+            // prevBtn.disabled = currentQuestionIndex === 0; // Removed
+            nextBtn.disabled = currentQuestionIndex === questions.length - 1;
+
+            if (currentQuestionIndex === questions.length - 1) {
+                nextBtn.style.display = 'none';
+                submitQuizBtn.style.display = 'block';
+            } else {
+                nextBtn.style.display = 'block';
+                submitQuizBtn.style.display = 'none';
+            }
+        }
+
+        // Event listener for video end
+        video.addEventListener('ended', () => {
+            video.style.display = 'none'; // Hide the video
+            startPreQuizCountdown(); // Start 3-second countdown before quiz
+        });
+
+        // Initialize audio when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            initAudio();
+        });
+
+        // Also initialize audio on first user interaction (required by browsers)
+        document.addEventListener('click', () => {
+            if (!countdownAudio) {
+                initAudio();
+            }
+        }, { once: true });
+
+        // Initialize audio on video play (user interaction)
+        video.addEventListener('play', () => {
+            if (!countdownAudio) {
+                initAudio();
+            }
+        });
+
+        // Handle fullscreen change to enable quiz in fullscreen
+        document.addEventListener('fullscreenchange', () => {
+            if (document.fullscreenElement === video) {
+                // Video is in fullscreen, enable quiz interaction
+                quizSection.style.display = 'block';
+                quizSection.style.position = 'fixed';
+                quizSection.style.top = '50%';
+                quizSection.style.left = '50%';
+                quizSection.style.transform = 'translate(-50%, -50%)';
+                quizSection.style.zIndex = '9999';
+                quizSection.style.background = 'rgba(26, 26, 46, 0.95)';
+                quizSection.style.padding = '30px';
+                quizSection.style.borderRadius = '10px';
+                quizSection.style.border = '2px solid var(--primary-color)';
+                quizSection.style.maxWidth = '800px';
+                quizSection.style.width = '90%';
+                loadQuestion(currentQuestionIndex);
+            } else if (document.fullscreenElement === null) {
+                // Exited fullscreen, reset quiz position
+                quizSection.style.position = 'relative';
+                quizSection.style.top = 'auto';
+                quizSection.style.left = 'auto';
+                quizSection.style.transform = 'none';
+                quizSection.style.zIndex = 'auto';
+                quizSection.style.background = 'transparent';
+                quizSection.style.padding = '0';
+                quizSection.style.borderRadius = '0';
+                quizSection.style.border = 'none';
+                quizSection.style.maxWidth = 'none';
+                quizSection.style.width = 'auto';
+            }
+        });
+
+        // Navigation for quiz
+        nextBtn.addEventListener('click', () => {
+            // Play button click sound
+            if (buttonClickAudio) {
+                buttonClickAudio.currentTime = 0; // Reset to beginning
+                buttonClickAudio.play().catch(e => console.log('Button click audio play failed:', e));
+            }
+            
+            if (currentQuestionIndex < questions.length - 1) {
+                // Stop current timer before moving to next question
+                stopQuestionTimer();
+                currentQuestionIndex++;
+                loadQuestion(currentQuestionIndex);
+                // Timer will automatically restart from 20 seconds in loadQuestion function
+            }
+        });
+
+        // Removed prevBtn event listener
+
+        // Submit Quiz
+        submitQuizBtn.addEventListener('click', () => {
+            // Play button click sound
+            if (buttonClickAudio) {
+                buttonClickAudio.currentTime = 0; // Reset to beginning
+                buttonClickAudio.play().catch(e => console.log('Button click audio play failed:', e));
+            }
+            
+            // Stop background music when submitting
+            if (quizBackgroundAudio) {
+                quizBackgroundAudio.pause();
+                quizBackgroundAudio.currentTime = 0;
+            }
+            
+            let score = 0;
+            detailedResults.innerHTML = ''; // Clear previous results
+
+            questions.forEach((q, index) => {
+                const userAnswer = userAnswers[index];
+                const isCorrect = userAnswer === q.correctAnswer;
+                if (isCorrect) {
+                    score++;
+                }
+
+                const resultDiv = document.createElement('div');
+                resultDiv.innerHTML = `
+                    <p><strong>Question ${index + 1}:</strong> ${q.question}</p>
+                    <p class="correct-answer">Correct Answer: ${q.correctAnswer}</p>
+                    <p class="your-answer">Your Answer: ${userAnswer || "No answer selected"}</p>
+                    ${!isCorrect ? `<p class="wrong-answer-feedback">Incorrect. Review your knowledge.</p>` : ''}
+                    <hr style="border-color: rgba(0, 255, 0, 0.2); margin: 15px 0;">
+                `;
+                detailedResults.appendChild(resultDiv);
+            });
+
+            scoreDisplay.textContent = `Your Score: ${score} / ${questions.length}`;
+            quizSection.style.display = 'none';
+            quizResults.style.display = 'block';
+        });
+
+        // Retake Quiz
+        retakeQuizBtn.addEventListener('click', () => {
+            // Play button click sound
+            if (buttonClickAudio) {
+                buttonClickAudio.currentTime = 0; // Reset to beginning
+                buttonClickAudio.play().catch(e => console.log('Button click audio play failed:', e));
+            }
+            
+            stopQuestionTimer(); // Stop any running timer
+            if (preQuizCountdown) {
+                clearInterval(preQuizCountdown);
+            }
+            currentQuestionIndex = 0;
+            userAnswers = {}; // Clear user answers
+            quizResults.style.display = 'none';
+            quizSection.style.display = 'none'; // Hide quiz initially
+            video.style.display = 'block'; // Show video again
+            video.currentTime = 0; // Reset video
+            video.play(); // Play video again
+        });
+
+        // Disable right-click on video to prevent "Save video as..."
+        video.addEventListener('contextmenu', e => e.preventDefault());
+
+        // Prevent seeking/scrolling on the video
+        video.addEventListener('seeking', function(e) {
+            e.preventDefault();
+            this.currentTime = this.currentTime; // Reset to current time
+        });
+
+        video.addEventListener('seeked', function(e) {
+            e.preventDefault();
+            this.currentTime = this.currentTime; // Reset to current time
+        });
+
+        // Prevent clicking on progress bar
+        video.addEventListener('click', function(e) {
+            // Check if click is on the progress bar area
+            const rect = this.getBoundingClientRect();
+            const clickY = e.clientY - rect.top;
+            const videoHeight = rect.height;
+            
+            // If click is in the bottom 10% of the video (where controls are), prevent seeking
+            if (clickY > videoHeight * 0.9) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        });
+
+        // Additional protection against keyboard seeking
+        video.addEventListener('keydown', function(e) {
+            // Prevent arrow keys and space bar from seeking
+            if ([32, 37, 38, 39, 40].includes(e.keyCode)) {
+                e.preventDefault();
+            }
+        });
+
+        // Add email watermark functionality
+        function addWatermarkToVideo() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const video = document.getElementById('trainingVideo');
+            
+            // Set canvas size to match video
+            canvas.width = video.videoWidth || 1920;
+            canvas.height = video.videoHeight || 1080;
+            
+            // Get user email (you can modify this to get from input or session)
+            const userEmail = prompt("Please enter your email address for security purposes:");
+            if (!userEmail) return;
+            
+            // Draw video frame on canvas
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            // Add watermark text
+            ctx.font = '24px Arial';
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
+            ctx.lineWidth = 2;
+            
+            const watermarkText = `Authorized for: ${userEmail}`;
+            const textMetrics = ctx.measureText(watermarkText);
+            const x = canvas.width - textMetrics.width - 20;
+            const y = canvas.height - 20;
+            
+            // Draw text with stroke
+            ctx.strokeText(watermarkText, x, y);
+            ctx.fillText(watermarkText, x, y);
+            
+            // Convert canvas to blob and create download link
+            canvas.toBlob(function(blob) {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `cybersecurity-training-${userEmail.replace(/[@.]/g, '-')}.mp4`;
+                a.click();
+                URL.revokeObjectURL(url);
+            }, 'video/mp4');
+        }
+
+        // Override video download attempts
+        video.addEventListener('loadstart', () => {
+            // Remove any existing download buttons
+            const downloadButtons = video.parentElement.querySelectorAll('[download]');
+            downloadButtons.forEach(btn => btn.remove());
+        });
+
+        // Additional protection against video extraction
+        setInterval(() => {
+            // Remove any dynamically added download buttons
+            const downloadElements = document.querySelectorAll('[download], a[href*=".mp4"], a[href*=".webm"]');
+            downloadElements.forEach(el => {
+                if (!el.hasAttribute('data-allowed')) {
+                    el.remove();
+                }
+            });
+        }, 1000);
+
+    </script>
+</body>
+</html>
